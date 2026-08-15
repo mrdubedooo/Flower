@@ -771,44 +771,61 @@
   }
 
   /* ============================================================
-     AUDIO
-  ============================================================ */
-  var audioReady = false;
-  var audioMuted = false;
+   AUDIO
+============================================================ */
+var audioEl = document.getElementById('audioEl');
+var audioReady = false;
+var audioMuted = false;
 
-  function fadeInAudio(){
-    <audio src="Lover.mp3">
-    audioEl.volume = 0;
-    var playPromise = audioEl.play();
-    if (playPromise && playPromise.then){
-      playPromise.then(function(){
-        audioReady = true;
-        var vol = 0;
-        var iv = setInterval(function(){
-          vol += 0.04;
-          if (vol >= 0.55){ vol = 0.55; clearInterval(iv); }
-          audioEl.volume = vol;
-        }, 90);
-      }).catch(function(){
-        // autoplay blocked — show a manual control instead
+function fadeInAudio() {
+  if (!audioEl) return;
+
+  audioEl.volume = 0;
+
+  var playPromise = audioEl.play();
+
+  if (playPromise && playPromise.then) {
+    playPromise.then(function () {
+      audioReady = true;
+
+      var vol = 0;
+      var iv = setInterval(function () {
+        vol += 0.04;
+
+        if (vol >= 0.55) {
+          vol = 0.55;
+          clearInterval(iv);
+        }
+
+        audioEl.volume = vol;
+      }, 90);
+
+    }).catch(function (error) {
+      console.log("Audio playback failed:", error);
+
+      if (audioHint) {
         audioHint.classList.add('show');
-      });
-    }
+      }
+    });
+  }
+}
+
+soundToggle.addEventListener('click', function (event) {
+  event.stopPropagation();
+
+  if (!audioReady) {
+    audioHint.classList.remove('show');
+    fadeInAudio();
+    soundToggle.textContent = '🔊';
+    audioMuted = false;
+    return;
   }
 
-  soundToggle.addEventListener('click', function(){
-    if (!audioReady){
-      audioHint.classList.remove('show');
-      fadeInAudio();
-      soundToggle.textContent = '🔊';
-      audioMuted = false;
-      return;
-    }
-    audioMuted = !audioMuted;
-    audioEl.muted = audioMuted;
-    soundToggle.textContent = audioMuted ? '🔇' : '🔊';
-  });
-
+  audioMuted = !audioMuted;
+  audioEl.muted = audioMuted;
+  soundToggle.textContent = audioMuted ? '🔇' : '🔊';
+});
+  
   /* ============================================================
      TRANSITION: intro -> garden
   ============================================================ */
