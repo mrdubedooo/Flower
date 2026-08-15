@@ -777,6 +777,7 @@
   var audioMuted = false;
 
   function fadeInAudio(){
+    <audio src="Lover.mp3">
     audioEl.volume = 0;
     var playPromise = audioEl.play();
     if (playPromise && playPromise.then){
